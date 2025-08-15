@@ -19,12 +19,12 @@ A busca de usuários para iniciar conversas é feita utilizando **o e-mail** com
 ## 📸 Demonstração
 
 ### Tela de Login
-![Login](image/login_photo.png)
+![Login](front_end/image/login_photo.png)
 
 ### Tela do Chat
-![Chat](image/chat_photo.png)
+![Chat](front_end/image/chat_photo.png)
 
 ### Tela da Home
-![Home](image/main_photo.png)
+![Home](front_end/image/main_photo.png)
 
 ---
