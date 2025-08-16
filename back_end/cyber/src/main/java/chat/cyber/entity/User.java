@@ -1,10 +1,11 @@
 package chat.cyber.entity;
 
+import chat.cyber.controller.dtos.CreateUserDTO;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.UUID;
-
-@Table(name = "user")
+@Table(name = "users")
 @Entity(name = "user")
 public class User {
 
@@ -18,13 +19,22 @@ public class User {
     @Column(length = 300, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(length = 100, nullable = false)
     private String password;
 
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
+    }
+
+    public User(CreateUserDTO data){
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        this.name = data.name();
+        this.email = data.email();
+        this.password = passwordEncoder.encode(data.password());
     }
 
     public User() {
