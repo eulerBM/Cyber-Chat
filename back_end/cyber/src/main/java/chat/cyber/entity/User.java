@@ -28,15 +28,6 @@ public class User {
         this.password = password;
     }
 
-    public User(CreateUserDTO data){
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        this.name = data.name();
-        this.email = data.email();
-        this.password = passwordEncoder.encode(data.password());
-    }
-
     public User() {
     }
 
