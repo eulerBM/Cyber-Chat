@@ -1,6 +1,7 @@
 package chat.cyber.service;
 
 import chat.cyber.controller.dtos.CreateUserDTO;
+import chat.cyber.controller.dtos.LoginUserDTO;
 import chat.cyber.entity.User;
 import chat.cyber.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,21 @@ public class AuthService {
         User user = new User(data.name(), data.email(), passwordEncoder.encode(data.password()));
 
         userRepository.save(user);
+
+        return ResponseEntity.ok().build();
+
+    }
+
+    public ResponseEntity<?> loginUser(LoginUserDTO data){
+
+        Optional<User> userEmail = userRepository.findByEmail(data.email());
+
+        if (userEmail.isEmpty()){
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail não existe!");
+        }
+
+        User user = userEmail.get();
 
         return ResponseEntity.ok().build();
 

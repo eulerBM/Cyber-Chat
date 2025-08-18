@@ -30,7 +30,6 @@ public class AuthControllerTest {
         authController = new AuthController(authService);
     }
 
-
     @Test
     @DisplayName("Senhas não parecidas devem não passar")
     void shouldReturnNotAcceptable_WhenPasswordsDoNotMatch(){

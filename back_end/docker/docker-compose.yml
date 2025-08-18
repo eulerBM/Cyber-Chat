@@ -5,8 +5,8 @@ services:
     image: postgres:17
     restart: always
     environment:
-      POSTGRES_PASSWORD: admin
-      POSTGRES_USER: postgres_cyber
-      POSTGRES_DB: cyber_db
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"

@@ -1,6 +1,7 @@
 package chat.cyber.controller;
 
 import chat.cyber.controller.dtos.CreateUserDTO;
+import chat.cyber.controller.dtos.LoginUserDTO;
 import chat.cyber.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,14 @@ public class AuthController {
     @PostMapping(path = "register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> CreateUser(@RequestBody CreateUserDTO data){
 
-    return authService.createUser(data);
+        return authService.createUser(data);
+
+    }
+
+    @PostMapping(path = "login", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> LoginUser(@RequestBody LoginUserDTO data){
+
+        return authService.loginUser(data);
 
     }
 }
