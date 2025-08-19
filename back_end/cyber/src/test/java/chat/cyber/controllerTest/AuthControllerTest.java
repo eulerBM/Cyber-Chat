@@ -4,6 +4,7 @@ import chat.cyber.controller.AuthController;
 import chat.cyber.controller.dtos.CreateUserDTO;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.AuthService;
+import chat.cyber.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,11 +23,12 @@ public class AuthControllerTest {
 
     private AuthController authController;
     private UserRepository userRepository;
+    private JwtService jwtService;
 
     @BeforeEach
     void setup() {
         userRepository = mock(UserRepository.class);
-        AuthService authService = new AuthService(userRepository);
+        AuthService authService = new AuthService(userRepository, jwtService);
         authController = new AuthController(authService);
     }
 

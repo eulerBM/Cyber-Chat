@@ -16,9 +16,11 @@ import java.util.Optional;
 public class AuthService {
 
     private UserRepository userRepository;
+    private JwtService jwtService;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -57,7 +59,17 @@ public class AuthService {
 
         User user = userEmail.get();
 
-        return ResponseEntity.ok().build();
+        boolean passwordIsEqual = passwordEncoder.matches(data.password(), user.getPassword());
+
+        if (!passwordIsEqual){
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senhas incorretas");
+
+        }
+
+        var tokenJwt = jwtService.generateAccessToken(user);
+
+        return ResponseEntity.ok().body(tokenJwt);
 
     }
 }
