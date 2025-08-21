@@ -15,17 +15,72 @@ export function RegisterForm({ onSwitchToLogin, onRegister }: RegisterFormProps)
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
     if (password !== confirmPassword) {
-      alert("As senhas não coincidem!");
+      setError("As senhas não coincidem!");
       return;
     }
-    onRegister(name, email, password);
+
+    var passwordConfirm = confirmPassword
+
+
+    const payload = { name, email, password, passwordConfirm};
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // tenta pegar mensagem do backend, se houver
+        let msg = "Não foi possível registrar";
+        try {
+          const json = await response.json();
+          msg = json?.message || JSON.stringify(json) || msg;
+        } catch {
+          const text = await response.text().catch(() => "");
+          if (text) msg = text;
+        }
+        setError(msg);
+        return;
+      }
+
+      // sucesso
+      const data = await response.json().catch(() => null);
+      setSuccess("Cadastro realizado com sucesso!");
+      onRegister(name, email, password);
+
+      // opcional: limpar campos
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      console.error(err);
+      setError("Erro na conexão com o servidor.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && <p className="text-sm text-red-500">{error}</p>}
+      {success && <p className="text-sm text-green-500">{success}</p>}
+
       <div className="space-y-2">
         <Label htmlFor="name" className="text-foreground/90">Nome</Label>
         <div className="relative">
@@ -90,9 +145,18 @@ export function RegisterForm({ onSwitchToLogin, onRegister }: RegisterFormProps)
         </div>
       </div>
 
-      <Button type="submit" variant="laser" className="w-full group">
-        Cadastrar
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      <Button type="submit" variant="laser" className="w-full group" disabled={loading}>
+        {loading ? (
+          <>
+            Cadastrando...
+            <ArrowRight className="w-4 h-4 ml-2 animate-[spin_1s_linear_infinite]" />
+          </>
+        ) : (
+          <>
+            Cadastrar
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform ml-2" />
+          </>
+        )}
       </Button>
 
       <div className="text-center">

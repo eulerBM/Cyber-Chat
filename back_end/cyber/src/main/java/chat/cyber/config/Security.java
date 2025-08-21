@@ -29,11 +29,7 @@ public class Security {
                 .csrf(csrf -> csrf.disable()) // Desativa CSRF para testes
 
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers(HttpMethod.GET, "/auth/user/test").authenticated()
-
                         .anyRequest().permitAll() // outras precisam de login
-
                 )
 
 

@@ -39,3 +39,6 @@ out/
 ### .env ###
 back_end/.env
 
+### Others ###
+front_end/node_modules
+

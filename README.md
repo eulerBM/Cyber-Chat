@@ -7,7 +7,7 @@ A busca de usuários para iniciar conversas é feita utilizando **o e-mail** com
 
 ## 🚀 Tecnologias Utilizadas
 
-* **Java 17+**
+* **Java 24**
 * **Spring Boot** (Spring Web, Spring Security, Spring Data JPA, WebSockets)
 * **PostgreSQL** (armazenamento de usuários e mensagens)
 * **JWT** (autenticação segura)

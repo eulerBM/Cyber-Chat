@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,10 +12,65 @@ interface LoginFormProps {
 export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(email, password);
+    setError(null);
+    setLoading(true);
+
+    try {
+    
+      const res = await fetch("http://localhost:8080/auth/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // credentials: "include", // descomente se seu backend usa cookies HttpOnly
+        body: JSON.stringify({ email, password }),
+      });
+
+      // tenta extrair JSON, mas não quebra se não vier JSON
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (!res.ok) {
+        const msg = data?.message || data?.error || res.statusText || "Erro no login";
+        throw new Error(msg);
+      }
+
+      // se o backend retornar um token, armazenar (avalie segurança - localStorage vs cookies)
+      if (data?.token) {
+        try {
+          localStorage.setItem("authToken", data.token);
+        } catch {
+          // storage pode falhar em ambientes restritos; não interromper fluxo
+        }
+      }
+
+      // opcional: salvar user se vier
+      if (data?.user) {
+        try {
+          localStorage.setItem("authUser", JSON.stringify(data.user));
+        } catch {}
+      }
+
+      // notifica o componente pai (mantive assinatura onLogin por compatibilidade)
+      try {
+        onLogin(email, password);
+      } catch {
+        // não falhar caso o pai lance erro
+      }
+    } catch (err: any) {
+      setError(err?.message || "Erro desconhecido ao tentar logar");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,9 +109,18 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
         </div>
       </div>
 
+      {error && <div className="text-sm text-red-600">{error}</div>}
+
       <div className="pt-2">
-        <Button type="submit" variant="laser" className="w-full h-12 text-lg font-medium group hover-lift" style={{ animationDelay: '0.2s' }}>
-          <span className="relative z-10">Entrar</span>
+        <Button
+          type="submit"
+          variant="laser"
+          className="w-full h-12 text-lg font-medium group hover-lift"
+          style={{ animationDelay: '0.2s' }}
+          disabled={loading}
+          aria-busy={loading}
+        >
+          <span className="relative z-10">{loading ? "Entrando..." : "Entrar"}</span>
           <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
         </Button>
       </div>
