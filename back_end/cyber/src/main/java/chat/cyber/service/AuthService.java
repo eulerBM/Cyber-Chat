@@ -4,6 +4,9 @@ import chat.cyber.controller.dtos.CreateUserDTO;
 import chat.cyber.controller.dtos.LoginUserDTO;
 import chat.cyber.entity.User;
 import chat.cyber.repository.UserRepository;
+import chat.cyber.service.response.ErroResponse;
+import chat.cyber.service.response.LoginUserResponse;
+import chat.cyber.service.response.UserInfoResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -54,7 +57,8 @@ public class AuthService {
 
         if (userEmail.isEmpty()){
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail não existe!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErroResponse("E-mail não existe", HttpStatus.NOT_FOUND.value()));
         }
 
         User user = userEmail.get();
@@ -63,13 +67,16 @@ public class AuthService {
 
         if (!passwordIsEqual){
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senhas incorretas");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErroResponse("Senhas diferentes", HttpStatus.UNAUTHORIZED.value()));
 
         }
 
-        var tokenJwt = jwtService.generateAccessToken(user);
+        String tokenJwt = jwtService.generateAccessToken(user);
 
-        return ResponseEntity.ok().body(tokenJwt);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new LoginUserResponse(tokenJwt,
+                        new UserInfoResponse(user.getIdPublic(), user.getName(), user.getEmail())));
 
     }
 }

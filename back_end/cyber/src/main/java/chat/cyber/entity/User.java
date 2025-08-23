@@ -1,9 +1,10 @@
 package chat.cyber.entity;
 
-import chat.cyber.controller.dtos.CreateUserDTO;
 import jakarta.persistence.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Table(name = "users")
 @Entity(name = "user")
@@ -12,6 +13,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(nullable = false)
+    private UUID idPublic;
 
     @Column(length = 100, nullable = false)
     private String name;
@@ -22,17 +26,35 @@ public class User {
     @Column(length = 100, nullable = false)
     private String password;
 
+    @ManyToMany(mappedBy = "users",
+            cascade = CascadeType.MERGE,
+            fetch = FetchType.LAZY,
+            targetEntity = Chat.class)
+    private Set<Chat> chat = new HashSet<>();
+
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.idPublic = UUID.randomUUID();
     }
 
-    public User() {
+    @PrePersist
+    public void generateIdPublic(){
+
+        if (idPublic == null){
+            idPublic = UUID.randomUUID();
+        }
     }
+
+    public User() {}
 
     public long getId() {
         return id;
+    }
+
+    public UUID getIdPublic() {
+        return idPublic;
     }
 
     public String getName() {

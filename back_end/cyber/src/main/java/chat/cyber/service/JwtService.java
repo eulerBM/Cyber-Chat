@@ -18,7 +18,10 @@ import java.util.UUID;
 public class JwtService {
 
     @Value("${jwt.access.token.expiration}")
-    private long expirationAccessToken;
+    private long accessTokenExpiration;
+
+    @Value("${jwt.refresh.token.expiration}")
+    private long refreshTokenExpiration;
 
     @Value("${JWT_SECRET}")
     private String tokenSecret;
@@ -32,13 +35,26 @@ public class JwtService {
     public String generateAccessToken(User user){
 
         return Jwts.builder()
-                .issuer("cyber")
+                .issuer("cyber-AccessToken")
                 .subject(user.getEmail())
-                .expiration(Date.from(Instant.now().plusSeconds(expirationAccessToken)))
+                .expiration(Date.from(Instant.now().plusSeconds(accessTokenExpiration)))
                 .issuedAt(new Date())
                 .id(UUID.randomUUID().toString())
                 .signWith(getSignInKey())
                 .compact();
+    }
+
+    public String generateRefreshToken(User user){
+
+        return Jwts.builder()
+                .issuer("cyber-RefreshToken")
+                .subject(user.getEmail())
+                .expiration(Date.from(Instant.now().plusSeconds(refreshTokenExpiration)))
+                .issuedAt(new Date())
+                .id(UUID.randomUUID().toString())
+                .signWith(getSignInKey())
+                .compact();
+
     }
 
     public boolean isTokenValid(String token){

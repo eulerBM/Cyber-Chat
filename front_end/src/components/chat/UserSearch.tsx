@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search, MessageCircle, User as UserIcon } from "lucide-react";
 
 interface User {
-  id: string;
+  idPublic: string;
   name: string;
   email: string;
   avatar?: string;
@@ -13,6 +13,39 @@ interface User {
 
 interface UserSearchProps {
   onSelectUser: (user: User) => void;
+  
+}
+
+function createChat(user: User) {
+  // Pega o usuário logado do localStorage (ajuste conforme sua implementação)
+  const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // Monta o DTO que o backend espera
+  const data = {
+    idPublicUserSend: loggedUser.idPublic,   // usuário logado
+    idPublicUserReceived: user.idPublic      // usuário selecionado
+  };
+
+  fetch("http://localhost:8080/chat/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error("Erro ao criar chat");
+      }
+      return response.json();
+    })
+    .then((result) => {
+      console.log("Chat criado com sucesso:", result);
+      // aqui você pode redirecionar para a tela do chat, por exemplo
+    })
+    .catch((error) => {
+      console.error("Erro:", error);
+    });
 }
 
 export function UserSearch({ onSelectUser }: UserSearchProps) {
@@ -26,7 +59,7 @@ export function UserSearch({ onSelectUser }: UserSearchProps) {
   // sanitize: remove sensitive fields (password) and normalize id => string
   const sanitizeRawUser = (raw: any): User => {
     return {
-      id: raw?.id != null ? String(raw.id) : "",
+      idPublic: raw?.idPublic != null ? String(raw.idPublic) : "",
       name: raw?.name ?? raw?.username ?? "Sem nome",
       email: raw?.email ?? "",
       avatar: raw?.avatar ?? undefined,
@@ -191,7 +224,10 @@ export function UserSearch({ onSelectUser }: UserSearchProps) {
                   <Button
                     variant="cyber"
                     size="sm"
-                    onClick={() => onSelectUser(user)}
+                    onClick={() => { onSelectUser(user);
+                                    createChat(user)
+
+                    }}
                     className="group-hover:scale-105 transition-transform duration-300"
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />

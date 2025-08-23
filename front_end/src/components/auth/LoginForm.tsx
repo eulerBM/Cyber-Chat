@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, ArrowRight } from "lucide-react";
+import Cookies from "js-cookie";
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -44,11 +45,18 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
         throw new Error(msg);
       }
 
+      console.log(data)
+
       // se o backend retornar um token, armazenar (avalie segurança - localStorage vs cookies)
-      if (data?.token) {
+      if (data?.accessToken) {
         try {
-          localStorage.setItem("authToken", data.token);
+
+          Cookies.set("token", data.accessToken, { expires: 7, path: "/" });
+          console.log(Cookies.get("token")); 
+
         } catch {
+
+          alert("Erro: Token não recebido")
           // storage pode falhar em ambientes restritos; não interromper fluxo
         }
       }
