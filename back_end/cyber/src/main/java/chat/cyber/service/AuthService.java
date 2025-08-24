@@ -2,6 +2,7 @@ package chat.cyber.service;
 
 import chat.cyber.controller.dtos.CreateUserDTO;
 import chat.cyber.controller.dtos.LoginUserDTO;
+import chat.cyber.controller.dtos.RefreshTokenDTO;
 import chat.cyber.entity.User;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.response.ErroResponse;
@@ -72,11 +73,16 @@ public class AuthService {
 
         }
 
-        String tokenJwt = jwtService.generateAccessToken(user);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new LoginUserResponse(tokenJwt,
+                .body(new LoginUserResponse(accessToken, refreshToken,
                         new UserInfoResponse(user.getIdPublic(), user.getName(), user.getEmail())));
 
+    }
+
+    public ResponseEntity<?> refresToken(RefreshTokenDTO data){
+        
     }
 }

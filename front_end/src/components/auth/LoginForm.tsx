@@ -23,7 +23,7 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
 
     try {
     
-      const res = await fetch("http://localhost:8080/auth/user/login", {
+      const res = await fetch("http://localhost:8080/auth/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

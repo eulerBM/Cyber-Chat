@@ -36,7 +36,7 @@ export function RegisterForm({ onSwitchToLogin, onRegister }: RegisterFormProps)
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/auth/user/register", {
+      const response = await fetch("http://localhost:8080/auth/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

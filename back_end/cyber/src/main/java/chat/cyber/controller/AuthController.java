@@ -2,12 +2,13 @@ package chat.cyber.controller;
 
 import chat.cyber.controller.dtos.CreateUserDTO;
 import chat.cyber.controller.dtos.LoginUserDTO;
+import chat.cyber.controller.dtos.RefreshTokenDTO;
 import chat.cyber.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth/user/")
+@RequestMapping("auth/users/")
 public class AuthController {
 
     private final AuthService authService;
@@ -28,6 +29,13 @@ public class AuthController {
     public ResponseEntity<?> LoginUser(@RequestBody LoginUserDTO data){
 
         return authService.loginUser(data);
+
+    }
+
+    @PostMapping(path = "refresh", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenDTO data){
+
+        return authService.refresToken(data);
 
     }
 }
