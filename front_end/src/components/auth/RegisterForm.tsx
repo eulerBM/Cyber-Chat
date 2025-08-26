@@ -29,8 +29,7 @@ export function RegisterForm({ onSwitchToLogin, onRegister }: RegisterFormProps)
       return;
     }
 
-    var passwordConfirm = confirmPassword
-
+    var passwordConfirm = confirmPassword;
 
     const payload = { name, email, password, passwordConfirm};
     setLoading(true);
@@ -48,8 +47,12 @@ export function RegisterForm({ onSwitchToLogin, onRegister }: RegisterFormProps)
         // tenta pegar mensagem do backend, se houver
         let msg = "Não foi possível registrar";
         try {
+
           const json = await response.json();
-          msg = json?.message || JSON.stringify(json) || msg;
+
+          console.log(json)
+          
+          msg = json?.content || JSON.stringify(json) || msg;
         } catch {
           const text = await response.text().catch(() => "");
           if (text) msg = text;

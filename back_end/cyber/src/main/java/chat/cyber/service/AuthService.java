@@ -7,6 +7,7 @@ import chat.cyber.entity.User;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.response.ErroResponse;
 import chat.cyber.service.response.LoginUserResponse;
+import chat.cyber.service.response.RefreshTokenResponse;
 import chat.cyber.service.response.UserInfoResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,8 @@ public class AuthService {
 
         if (!data.password().equals(data.passwordConfirm())){
 
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Senhas Incompatíveis");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErroResponse("As senhas não coincidem", 400));
 
         }
 
@@ -41,14 +43,15 @@ public class AuthService {
 
         if (userEmail.isPresent()){
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail ja cadastrado");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ErroResponse("E-mail ja cadastrado", 409));
         }
 
         User user = new User(data.name(), data.email(), passwordEncoder.encode(data.password()));
 
         userRepository.save(user);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
@@ -83,6 +86,28 @@ public class AuthService {
     }
 
     public ResponseEntity<?> refresToken(RefreshTokenDTO data){
-        
+
+        Optional<User> userSearch = userRepository.findByIdPublic(data.idPublicUser());
+
+        if (userSearch.isEmpty()){
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErroResponse("idPublic não vinculado a nenhuma conta", 404));
+        }
+
+        User getUser = userSearch.get();
+
+        boolean isValidTokenRefresToken = jwtService.isRefreshTokenValid(data.refreshToken(), getUser);
+
+        if (isValidTokenRefresToken){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ErroResponse("Token ainda é valido, não é necessário renovar.", 200));
+        }
+
+        String newTokenRefresh = jwtService.generateRefreshToken(getUser);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new RefreshTokenResponse(newTokenRefresh));
+
     }
 }

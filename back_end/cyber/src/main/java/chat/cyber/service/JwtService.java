@@ -76,6 +76,31 @@ public class JwtService {
         }
     }
 
+    public boolean isRefreshTokenValid(String token, User user){
+
+        try {
+
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            if (!claims.getSubject().equals(user.getEmail())){
+
+                return false;
+
+            }
+
+            return !claims.getExpiration().before(new Date());
+
+        } catch (JwtException e) {
+
+            return false;
+
+        }
+    }
+
     public Claims getClaims(String token){
 
         Claims payload = Jwts.parser()

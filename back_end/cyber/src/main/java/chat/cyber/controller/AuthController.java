@@ -4,6 +4,7 @@ import chat.cyber.controller.dtos.CreateUserDTO;
 import chat.cyber.controller.dtos.LoginUserDTO;
 import chat.cyber.controller.dtos.RefreshTokenDTO;
 import chat.cyber.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,14 +20,14 @@ public class AuthController {
     }
 
     @PostMapping(path = "register", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> CreateUser(@RequestBody CreateUserDTO data){
+    public ResponseEntity<?> CreateUser(@Valid @RequestBody CreateUserDTO data){
 
         return authService.createUser(data);
 
     }
 
     @PostMapping(path = "login", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> LoginUser(@RequestBody LoginUserDTO data){
+    public ResponseEntity<?> LoginUser(@Valid @RequestBody LoginUserDTO data){
 
         return authService.loginUser(data);
 
