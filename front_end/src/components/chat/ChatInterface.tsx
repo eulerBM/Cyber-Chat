@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, ArrowLeft, User } from "lucide-react";
 
+import { Client } from "@stomp/stompjs";
+
+
 interface Message {
   id: string;
   content: string;
@@ -24,24 +27,10 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content: "Olá! Como você está?",
-      senderId: selectedUser.id,
-      timestamp: new Date(Date.now() - 60000),
-      isOwn: false
-    },
-    {
-      id: "2",
-      content: "Oi! Estou bem, obrigado por perguntar! E você?",
-      senderId: "current-user",
-      timestamp: new Date(Date.now() - 30000),
-      isOwn: true
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,34 +40,97 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
     scrollToBottom();
   }, [messages]);
 
+
+
+
+
+
+
+  // 🔌 Conectar WebSocket ao entrar no componente
+  useEffect(() => {
+
+
+    const stompClient = new Client({
+  brokerURL: "ws://localhost:8080/ws-chat",
+  reconnectDelay: 5000,
+  debug: (str) => console.log(str),
+});
+
+stompClient.onConnect = (frame) => {
+  console.log("Conectado!");
+  stompClient.subscribe("/topic/messages", (msg) => {
+    console.log(JSON.parse(msg.body));
+  });
+};
+
+stompClient.activate();
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+    
+
+  }, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !wsRef.current) return;
 
-    const message: Message = {
-      id: Date.now().toString(),
+    const message = {
+      type: "MESSAGE",
       content: newMessage,
-      senderId: "current-user",
-      timestamp: new Date(),
-      isOwn: true
+      senderId: "current-user"
     };
 
-    setMessages(prev => [...prev, message]);
+    // Envia pelo WebSocket
+    wsRef.current.send(JSON.stringify(message));
+
+    // Atualiza localmente
+    setMessages((prev) => [
+      ...prev,
+      { ...message, id: Date.now().toString(), timestamp: new Date(), isOwn: true }
+    ]);
+
     setNewMessage("");
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('pt-BR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit"
     });
   };
 
   return (
     <div className="glass-effect cyber-glow laser-border rounded-lg h-[700px] flex flex-col hover-lift relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 mesh-gradient opacity-5 pointer-events-none" />
-      
       {/* Header */}
       <div className="flex items-center p-6 border-b border-primary/20 backdrop-blur-sm relative z-10">
         <Button
@@ -89,7 +141,7 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        
+
         <div className="flex items-center space-x-4">
           <div className="relative">
             <div className="w-12 h-12 rounded-full bg-gradient-laser flex items-center justify-center text-sm font-bold shadow-glow">
@@ -112,62 +164,44 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
         {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
+            className={`flex ${message.isOwn ? "justify-end" : "justify-start"} animate-fade-in-up`}
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <div
               className={`max-w-xs lg:max-w-md px-6 py-3 rounded-2xl relative ${
                 message.isOwn
-                  ? 'bg-gradient-laser text-primary-foreground shadow-glow'
-                  : 'glass-effect text-foreground border border-primary/20'
+                  ? "bg-gradient-laser text-primary-foreground shadow-glow"
+                  : "glass-effect text-foreground border border-primary/20"
               } hover-lift transition-all duration-300`}
             >
               <p className="text-sm leading-relaxed">{message.content}</p>
-              <p className={`text-xs mt-2 ${
-                message.isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
-              }`}>
+              <p
+                className={`text-xs mt-2 ${
+                  message.isOwn
+                    ? "text-primary-foreground/70"
+                    : "text-muted-foreground"
+                }`}
+              >
                 {formatTime(message.timestamp)}
               </p>
-              
-              {/* Message indicator */}
-              <div className={`absolute top-3 ${
-                message.isOwn ? '-left-2' : '-right-2'
-              } w-4 h-4 rounded-full ${
-                message.isOwn ? 'bg-gradient-laser' : 'bg-secondary/50 border border-primary/20'
-              } shadow-sm`} />
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
+      {/* Input */}
       <form onSubmit={handleSendMessage} className="p-6 border-t border-primary/20 backdrop-blur-sm relative z-10">
         <div className="flex space-x-4">
-          <div className="flex-1 relative group">
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Digite sua mensagem..."
-              className="h-12 pr-4 glass-effect border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 cyber-glow transition-all duration-300"
-            />
-          </div>
-          <Button 
-            type="submit" 
-            variant="laser" 
-            size="icon" 
-            className="shrink-0 w-12 h-12 hover-lift"
-          >
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Digite sua mensagem..."
+            className="h-12 pr-4 glass-effect border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 cyber-glow transition-all duration-300"
+          />
+          <Button type="submit" variant="laser" size="icon" className="shrink-0 w-12 h-12 hover-lift">
             <Send className="w-5 h-5" />
           </Button>
-        </div>
-        
-        <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-          <span>Pressione Enter para enviar</span>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-green-500 rounded-full pulse-glow" />
-            <span>Online</span>
-          </div>
         </div>
       </form>
     </div>

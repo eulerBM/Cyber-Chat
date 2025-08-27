@@ -36,27 +36,33 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
       let data: any = null;
       try {
         data = await res.json();
+
+        console.log(data)
+
+        console.log(data)
       } catch {
         data = null;
       }
 
       if (!res.ok) {
-        const msg = data?.message || data?.error || res.statusText || "Erro no login";
+        const msg = data?.content || data?.error || res.statusText || "Erro no login";
         throw new Error(msg);
       }
 
-      console.log(data)
-
       // se o backend retornar um token, armazenar (avalie segurança - localStorage vs cookies)
-      if (data?.accessToken) {
+      if (data?.accessToken && data?.refreshToken) {
         try {
 
-          Cookies.set("token", data.accessToken, { expires: 7, path: "/" });
-          console.log(Cookies.get("token")); 
+          const now = new Date();
+          const expirationTime = new Date(now.getTime() + 15 * 60 * 1000);
+
+
+          Cookies.set("tokenAccess", data.accessToken, { expires: expirationTime, path: "/" });
+          Cookies.set("tokenRefresh", data.refreshToken, { expires: 14, path: "/" });
 
         } catch {
 
-          alert("Erro: Token não recebido")
+          alert("Erro: Tokens não recebido")
           // storage pode falhar em ambientes restritos; não interromper fluxo
         }
       }
@@ -64,7 +70,7 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
       // opcional: salvar user se vier
       if (data?.user) {
         try {
-          localStorage.setItem("authUser", JSON.stringify(data.user));
+          localStorage.setItem("user", JSON.stringify(data.user));
         } catch {}
       }
 

@@ -13,15 +13,16 @@ public class socketConfig implements WebSocketMessageBrokerConfigurer {
      @Override
      public void configureMessageBroker(MessageBrokerRegistry config){
 
-         config.enableSimpleBroker("/topic");
+         config.enableSimpleBroker("/topic", "/queue");
          config.setApplicationDestinationPrefixes("/app");
+         config.setUserDestinationPrefix("/user"); // necessário p/ enviar msg privada
 
      }
 
      @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
          // Endpoint para se conectar ao WebSocket
-         registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*").withSockJS();
+         registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*");
 
      }
 }

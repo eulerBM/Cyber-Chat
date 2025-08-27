@@ -3,6 +3,8 @@ package chat.cyber.service;
 import chat.cyber.controller.dtos.EmailUserDTO;
 import chat.cyber.entity.User;
 import chat.cyber.repository.UserRepository;
+import chat.cyber.service.response.ErroResponse;
+import chat.cyber.service.response.SearchUserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,13 @@ public class SearchService {
 
         if (getEmail.isEmpty()){
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail não existe");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErroResponse("Usuario com esse e-mail não existe", 404));
 
         }
 
-        return ResponseEntity.ok().body(getEmail.get());
+        User userGet = getEmail.get();
+
+        return ResponseEntity.ok().body(new SearchUserResponse(userGet.getEmail(), userGet.getIdPublic()));
     }
 }

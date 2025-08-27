@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UserSearch } from "@/components/chat/UserSearch";
 import { ChatInterface } from "@/components/chat/ChatInterface";
-import { LogOut, MessageSquare } from "lucide-react";
+import { Currency, LogOut, MessageSquare } from "lucide-react";
 
 interface User {
   id: string;
@@ -14,7 +14,9 @@ interface User {
 interface DashboardProps {
   currentUser: { name: string; email: string };
   onLogout: () => void;
+  
 }
+
 
 export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);

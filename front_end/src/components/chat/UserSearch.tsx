@@ -19,11 +19,12 @@ interface UserSearchProps {
 function createChat(user: User) {
   // Pega o usuário logado do localStorage (ajuste conforme sua implementação)
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const searchUser = JSON.parse(localStorage.getItem("searchUser") || "{}");
 
   // Monta o DTO que o backend espera
   const data = {
     idPublicUserSend: loggedUser.idPublic,   // usuário logado
-    idPublicUserReceived: user.idPublic      // usuário selecionado
+    idPublicUserReceived: searchUser      // usuário selecionado
   };
 
   fetch("http://localhost:8080/chat/create", {
@@ -82,6 +83,7 @@ export function UserSearch({ onSelectUser }: UserSearchProps) {
     setSearchResults([]);
 
     try {
+      localStorage.removeItem("searchUser")
       const url = "http://localhost:8080/search/email"; // POST endpoint
       const res = await fetch(url, {
         method: "POST",
@@ -95,17 +97,20 @@ export function UserSearch({ onSelectUser }: UserSearchProps) {
       // Try to parse JSON (graceful if not JSON)
       let data: any = null;
       try {
+
         data = await res.json();
+
+        localStorage.setItem("searchUser", data.idPublic)
+  
       } catch {
         data = null;
       }
-
-      console.log(res)
 
       if (!res.ok) {
         const msg = data?.message || data?.error || res.statusText || `Erro ${res.status}`;
         throw new Error(msg);
       }
+
 
       // Normalize possible response shapes:
       // 1) single entity { id, name, email, password } => wrap into array

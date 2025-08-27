@@ -62,7 +62,7 @@ public class AuthService {
         if (userEmail.isEmpty()){
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErroResponse("E-mail não existe", HttpStatus.NOT_FOUND.value()));
+                    .body(new ErroResponse("E-mail não existe", 404));
         }
 
         User user = userEmail.get();
@@ -72,7 +72,7 @@ public class AuthService {
         if (!passwordIsEqual){
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErroResponse("Senhas diferentes", HttpStatus.UNAUTHORIZED.value()));
+                    .body(new ErroResponse("Senhas diferentes", 401));
 
         }
 

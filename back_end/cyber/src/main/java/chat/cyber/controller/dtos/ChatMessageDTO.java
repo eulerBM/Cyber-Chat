@@ -4,31 +4,31 @@ import chat.cyber.entity.Message;
 
 public class ChatMessageDTO {
 
-    private String idPublicUserSend;
-    private String idPublicUserReceived;
-    private Message message;
+    private String senderId;
+    private String receiverId;
+    private String content;
 
-    public String getIdPublicUserSend() {
-        return idPublicUserSend;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setIdPublicUserSend(String idPublicUserSend) {
-        this.idPublicUserSend = idPublicUserSend;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
-    public String getIdPublicUserReceived() {
-        return idPublicUserReceived;
+    public String getReceiverId() {
+        return receiverId;
     }
 
-    public void setIdPublicUserReceived(String idPublicUserReceived) {
-        this.idPublicUserReceived = idPublicUserReceived;
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
     }
 
-    public Message getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
+    public void setContent(String content) {
+        this.content = content;
     }
 }

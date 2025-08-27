@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
         ex.getBindingResult().getAllErrors().forEach(error -> {
 
-            ErroResponse erroResponse = new ErroResponse(error.getDefaultMessage(), HttpStatus.BAD_REQUEST.value());
+            ErroResponse erroResponse = new ErroResponse(error.getDefaultMessage(), 400);
 
             errors.add(erroResponse);
 
