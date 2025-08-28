@@ -19,12 +19,14 @@ interface UserSearchProps {
 function createChat(user: User) {
   // Pega o usuário logado do localStorage (ajuste conforme sua implementação)
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const searchUser = JSON.parse(localStorage.getItem("searchUser") || "{}");
+  const searchUser = localStorage.getItem("searchUser") || "{}";
 
   // Monta o DTO que o backend espera
   const data = {
+
     idPublicUserSend: loggedUser.idPublic,   // usuário logado
     idPublicUserReceived: searchUser      // usuário selecionado
+   
   };
 
   fetch("http://localhost:8080/chat/create", {
@@ -33,20 +35,24 @@ function createChat(user: User) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
+
   })
     .then(async (response) => {
       if (!response.ok) {
-        throw new Error("Erro ao criar chat");
-      }
-      return response.json();
-    })
-    .then((result) => {
-      console.log("Chat criado com sucesso:", result);
-      // aqui você pode redirecionar para a tela do chat, por exemplo
-    })
-    .catch((error) => {
-      console.error("Erro:", error);
-    });
+          throw new Error("Erro ao criar chat");
+        }
+      const chatId = await response.text(); // ✅ pega como string
+
+      const data = await response.json
+
+      localStorage.setItem("chatIdPublic", data.idPublicChat)
+
+      return chatId;
+      })
+      .then((chatId) => {
+      console.info("Usuário criado no banco com sucesso");
+      console.log("ID do chat:", chatId);
+})
 }
 
 export function UserSearch({ onSelectUser }: UserSearchProps) {
@@ -229,8 +235,10 @@ export function UserSearch({ onSelectUser }: UserSearchProps) {
                   <Button
                     variant="cyber"
                     size="sm"
-                    onClick={() => { onSelectUser(user);
-                                    createChat(user)
+                    onClick={() => { 
+                      createChat(user);
+                      onSelectUser(user)
+                                    
 
                     }}
                     className="group-hover:scale-105 transition-transform duration-300"

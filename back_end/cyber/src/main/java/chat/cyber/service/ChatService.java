@@ -5,6 +5,7 @@ import chat.cyber.entity.Chat;
 import chat.cyber.entity.User;
 import chat.cyber.repository.ChatRepository;
 import chat.cyber.repository.UserRepository;
+import chat.cyber.service.response.ChatIdPublicResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class ChatService {
 
         chatRepository.save(createChat);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).body(new ChatIdPublicResponse(createChat.getIdPublic()));
 
     }
 }

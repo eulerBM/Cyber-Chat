@@ -49,35 +49,32 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
   // 🔌 Conectar WebSocket ao entrar no componente
   useEffect(() => {
 
-
     const stompClient = new Client({
-  brokerURL: "ws://localhost:8080/ws-chat",
-  reconnectDelay: 5000,
-  debug: (str) => console.log(str),
-});
+      brokerURL: "ws://localhost:8080/ws-chat",
+      reconnectDelay: 5000,
+      debug: (str) => console.log(str),
+    });
 
-stompClient.onConnect = (frame) => {
-  console.log("Conectado!");
-  stompClient.subscribe("/topic/messages", (msg) => {
-    console.log(JSON.parse(msg.body));
-  });
-};
+    stompClient.onConnect = (frame) => {
+      console.log("Conectado!");
+      stompClient.subscribe("/topic/messages", (msg) => {
+        console.log(JSON.parse(msg.body));
+      });
+    };
 
-stompClient.activate();
     
+
+
+
+  
+    stompClient.activate();
+
   
 
 
 
 
 
-
-
-
-
-
-
-    
 
   }, []);
 
