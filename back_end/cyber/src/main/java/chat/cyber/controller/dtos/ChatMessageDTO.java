@@ -2,11 +2,22 @@ package chat.cyber.controller.dtos;
 
 import chat.cyber.entity.Message;
 
+import java.util.UUID;
+
 public class ChatMessageDTO {
 
+    private UUID chatIdPublic;
     private String senderId;
     private String receiverId;
     private String content;
+
+    public UUID getChatIdPublic() {
+        return chatIdPublic;
+    }
+
+    public void setChatIdPublic(UUID chatIdPublic) {
+        this.chatIdPublic = chatIdPublic;
+    }
 
     public String getSenderId() {
         return senderId;

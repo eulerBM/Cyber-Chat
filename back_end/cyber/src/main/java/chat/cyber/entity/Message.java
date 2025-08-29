@@ -26,6 +26,16 @@ public class Message {
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 
+    public Message(User sender, String content, LocalDateTime timestamp, Chat chat) {
+        this.sender = sender;
+        this.content = content;
+        this.timestamp = timestamp;
+        this.chat = chat;
+    }
+
+    public Message() {
+    }
+
     public long getId() {
         return id;
     }

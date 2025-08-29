@@ -6,6 +6,7 @@ import chat.cyber.entity.User;
 import chat.cyber.repository.ChatRepository;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.response.ChatIdPublicResponse;
+import chat.cyber.service.response.ErroResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class ChatService {
@@ -32,6 +34,7 @@ public class ChatService {
         Optional<User> userSendByIdpublic = userRepository.findByIdPublic(data.idPublicUserSend());
         Optional<User> userReceivedByIdpublic = userRepository.findByIdPublic(data.idPublicUserReceived());
 
+
         if (userSendByIdpublic.isEmpty() || userReceivedByIdpublic.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuarios não encontrados");
         }
@@ -43,6 +46,16 @@ public class ChatService {
 
         usersSet.add(userSendGet);
         usersSet.add(userReceivedGet);
+
+        Optional<Chat> chatGetUsers = chatRepository.findByUsers(userSendByIdpublic.get().getId(), userReceivedByIdpublic.get().getId());
+
+        if (chatGetUsers.isPresent()){
+
+            UUID chatGetIdPublic = chatGetUsers.get().getIdPublic();
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ChatIdPublicResponse((chatGetIdPublic)));
+        }
 
         Chat createChat = new Chat("chat: " + userSendGet.getEmail() + userReceivedGet.getEmail(), usersSet);
 

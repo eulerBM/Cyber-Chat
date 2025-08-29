@@ -38,16 +38,26 @@ function createChat(user: User) {
 
   })
     .then(async (response) => {
+
       if (!response.ok) {
+
+          if (response.status === 409){
+
+            throw new Error("Chat ja existe")
+            
+          }
+
+          console.log(response.json)
           throw new Error("Erro ao criar chat");
         }
-      const chatId = await response.text(); // ✅ pega como string
 
-      const data = await response.json
+      const data = await response.json()
+
+      console.log("O ID do chat é ", data)
 
       localStorage.setItem("chatIdPublic", data.idPublicChat)
 
-      return chatId;
+    
       })
       .then((chatId) => {
       console.info("Usuário criado no banco com sucesso");
