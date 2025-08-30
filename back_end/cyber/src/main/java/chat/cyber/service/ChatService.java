@@ -5,11 +5,11 @@ import chat.cyber.entity.Chat;
 import chat.cyber.entity.User;
 import chat.cyber.repository.ChatRepository;
 import chat.cyber.repository.UserRepository;
-import chat.cyber.service.response.ChatIdPublicResponse;
-import chat.cyber.service.response.ErroResponse;
+import chat.cyber.service.response.ChatResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -51,17 +51,27 @@ public class ChatService {
 
         if (chatGetUsers.isPresent()){
 
-            UUID chatGetIdPublic = chatGetUsers.get().getIdPublic();
+            System.out.println("Esse chat ta presente!");
 
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ChatIdPublicResponse((chatGetIdPublic)));
+            Chat chatGet = chatGetUsers.get();
+
+            return ResponseEntity.ok().body(new ChatResponse(chatGet.getIdPublic()));
         }
 
         Chat createChat = new Chat("chat: " + userSendGet.getEmail() + userReceivedGet.getEmail(), usersSet);
 
         chatRepository.save(createChat);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ChatIdPublicResponse(createChat.getIdPublic()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ChatResponse(createChat.getIdPublic()));
+
+    }
+
+    public ResponseEntity<?> getHistoricalMessages(UUID idPublicChat){
+
+        Chat chat = chatRepository.findByIdPublic(idPublicChat)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat não encontrado"));
+
+        return ResponseEntity.ok().body(chat.getMessages());
 
     }
 }

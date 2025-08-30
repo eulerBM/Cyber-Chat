@@ -1,37 +1,33 @@
 package chat.cyber.controller.dtos;
 
-import chat.cyber.entity.Message;
-
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ChatMessageDTO {
 
     private UUID chatIdPublic;
-    private String senderId;
-    private String receiverId;
+    private UUID senderId;
+    private UUID receiverId;
     private String content;
+    private LocalDateTime date;
 
     public UUID getChatIdPublic() {
         return chatIdPublic;
     }
 
-    public void setChatIdPublic(UUID chatIdPublic) {
-        this.chatIdPublic = chatIdPublic;
-    }
-
-    public String getSenderId() {
+    public UUID getSenderId() {
         return senderId;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getReceiverId() {
+    public UUID getReceiverId() {
         return receiverId;
     }
 
-    public void setReceiverId(String receiverId) {
+    public void setSenderId(UUID senderId) {
+        this.senderId = senderId;
+    }
+
+    public void setReceiverId(UUID receiverId) {
         this.receiverId = receiverId;
     }
 
@@ -39,7 +35,21 @@ public class ChatMessageDTO {
         return content;
     }
 
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setChatIdPublic(UUID chatIdPublic) {
+        this.chatIdPublic = chatIdPublic;
+    }
+
+
+
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }

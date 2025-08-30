@@ -1,5 +1,6 @@
 package chat.cyber.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -24,13 +25,13 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
+    @JsonIgnore
     private Chat chat;
 
-    public Message(User sender, String content, LocalDateTime timestamp, Chat chat) {
+    public Message(User sender, String content, LocalDateTime timestamp) {
         this.sender = sender;
         this.content = content;
         this.timestamp = timestamp;
-        this.chat = chat;
     }
 
     public Message() {

@@ -41,21 +41,27 @@ function createChat(user: User) {
 
       if (!response.ok) {
 
-          if (response.status === 409){
+            if (response.status === 409){
 
-            throw new Error("Chat ja existe")
-            
+              throw new Error("Chat ja existe")
+              
+            }
+
+            console.log(response.json)
+            throw new Error("Erro ao criar chat");
           }
-
-          console.log(response.json)
-          throw new Error("Erro ao criar chat");
-        }
 
       const data = await response.json()
 
-      console.log("O ID do chat é ", data)
+      
 
-      localStorage.setItem("chatIdPublic", data.idPublicChat)
+      if(data.idPublicChat){
+
+        localStorage.setItem("chatIdPublic", data.idPublicChat)
+
+      }
+
+      console.log(data)
 
     
       })
