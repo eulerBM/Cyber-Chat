@@ -25,6 +25,7 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,9 +45,6 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
 
   // 🔌 Pega o histórico de mensagens
 useEffect(() => {
-  const data = {
-    idPublicChat: getIdPublicChat, // Id Público do chat
-  };
 
   fetch("http://localhost:8080/chat/historical", {
     method: "POST",
@@ -68,10 +66,25 @@ useEffect(() => {
       const data = await response.json();
       console.log(data);
 
-      if (data.messages) {
-        data.messages.forEach((msg) => {
-          setMessages
-          console.log(msg.content);
+      if (data.message) {
+        data.message.forEach((msg) => {
+
+
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: msg.id,
+              content: msg.content,
+              senderId: msg.sender.idPublic,
+              timestamp: msg.timestamp,
+              isOwn: msg.sender.idPublic === currentUserId,
+              
+            },
+          ]);
+
+          
+          console.log("msg pegas: ", msg.content);
         });
       }
     })
@@ -101,11 +114,13 @@ useEffect(() => {
           const message = JSON.parse(msg.body);
           console.log("📩 Recebida:", message);
 
+          console.log("Date da msg: ", message.date)
+
           setMessages((prev) => [
             ...prev,
             {
               ...message,
-              id: Date.now().toString(),
+              id: message.id,
               timestamp: message.date,
               isOwn: message.senderId === currentUserId,
             },
@@ -145,15 +160,20 @@ useEffect(() => {
 
     };
 
-    const formatTime = (date: Date) => {
+  const formatTime = (date: string | Date) => {
 
-      const dateConvert = new Date(date);
+    let fixedDate = typeof date === "string" && !date.endsWith("Z")
+      ? date + "Z"
+      : date;
 
-      return dateConvert.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    };
+    const dateConvert = new Date(fixedDate);
+
+    return dateConvert.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Sao_Paulo",
+    });
+  };
 
     return (
       <div className="glass-effect cyber-glow laser-border rounded-lg h-[700px] flex flex-col hover-lift relative overflow-hidden">

@@ -12,9 +12,10 @@ import java.util.UUID;
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c FROM Chat c " +
-            "JOIN c.users u1 " +
-            "JOIN c.users u2 " +
-            "WHERE u1.id = :user1 AND u2.id = :user2")
+            "JOIN c.users u " +
+            "WHERE u.id IN (:user1, :user2) " +
+            "GROUP BY c.id " +
+            "HAVING COUNT(c) = 2")
     Optional<Chat> findByUsers(@Param("user1") Long user1, @Param("user2") Long user2);
 
     Optional<Chat> findByIdPublic(UUID idPublic);

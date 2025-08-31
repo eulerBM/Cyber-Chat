@@ -33,6 +33,6 @@ public class SearchService {
 
         User userGet = getEmail.get();
 
-        return ResponseEntity.ok().body(new SearchUserResponse(userGet.getEmail(), userGet.getIdPublic()));
+        return ResponseEntity.ok().body(new SearchUserResponse(userGet.getName() ,userGet.getEmail(), userGet.getIdPublic()));
     }
 }

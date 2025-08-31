@@ -59,6 +59,7 @@ public class Chat {
         return id;
     }
 
+
     public UUID getIdPublic() {
         return idPublic;
     }

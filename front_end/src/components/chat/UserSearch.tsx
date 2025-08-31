@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MessageCircle, User as UserIcon } from "lucide-react";
+import { set } from "date-fns";
 
 interface User {
   idPublic: string;
@@ -17,9 +18,11 @@ interface UserSearchProps {
 }
 
 function createChat(user: User) {
+  
   // Pega o usuário logado do localStorage (ajuste conforme sua implementação)
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const searchUser = localStorage.getItem("searchUser") || "{}";
+  const [error, setError] = useState<string | null>(null);
 
   // Monta o DTO que o backend espera
   const data = {
@@ -45,6 +48,11 @@ function createChat(user: User) {
 
               throw new Error("Chat ja existe")
               
+            }
+            else if(response.status === 404){
+
+              throw new Error("Usuario não encontrado")
+
             }
 
             console.log(response.json)

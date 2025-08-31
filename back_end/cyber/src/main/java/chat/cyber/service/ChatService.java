@@ -6,6 +6,7 @@ import chat.cyber.entity.User;
 import chat.cyber.repository.ChatRepository;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.response.ChatResponse;
+import chat.cyber.service.response.MessagesChatResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -71,7 +72,7 @@ public class ChatService {
         Chat chat = chatRepository.findByIdPublic(idPublicChat)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat não encontrado"));
 
-        return ResponseEntity.ok().body(chat.getMessages());
+        return ResponseEntity.ok().body(new MessagesChatResponse(chat.getMessages()));
 
     }
 }
