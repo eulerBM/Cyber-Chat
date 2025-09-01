@@ -22,27 +22,18 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
     setLoading(true);
 
     try {
-    
+      localStorage.clear()
       const res = await fetch("http://localhost:8080/auth/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        // credentials: "include", // descomente se seu backend usa cookies HttpOnly
+        
         body: JSON.stringify({ email, password }),
       });
 
-      // tenta extrair JSON, mas não quebra se não vier JSON
-      let data: any = null;
-      try {
-        data = await res.json();
-
-        console.log(data)
-
-        console.log(data)
-      } catch {
-        data = null;
-      }
+      let data = await res.json();
+      
 
       if (!res.ok) {
         const msg = data?.content || data?.error || res.statusText || "Erro no login";
@@ -62,23 +53,26 @@ export function LoginForm({ onSwitchToRegister, onLogin }: LoginFormProps) {
 
         } catch {
 
-          alert("Erro: Tokens não recebido")
-          // storage pode falhar em ambientes restritos; não interromper fluxo
+          throw new Error("Tente mais tarde, estamos com poblemas de tokens")
+
         }
       }
 
-      // opcional: salvar user se vier
       if (data?.user) {
         try {
           localStorage.setItem("user", JSON.stringify(data.user));
-        } catch {}
+        } catch (err) {
+          throw new Error("Não foi possível salvar os dados do usuário localmente.");
+        }
+      } else {
+        throw new Error("Usuário não encontrado na resposta da API, converse com os ADM.");
       }
 
       // notifica o componente pai (mantive assinatura onLogin por compatibilidade)
       try {
         onLogin(email, password);
       } catch {
-        // não falhar caso o pai lance erro
+        throw new Error("Falha ao efetuar Login.")
       }
     } catch (err: any) {
       setError(err?.message || "Erro desconhecido ao tentar logar");

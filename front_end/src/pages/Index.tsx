@@ -11,10 +11,21 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
 
   const handleAuthenticated = (authenticatedUser: User) => {
-    setUser(authenticatedUser);
+    const userIn = JSON.parse(localStorage.getItem("user"));
+
+    const filteredUser: User = {
+
+      name: userIn?.name ?? "Usuário Desconhecido",
+      email: userIn?.email ?? "email@desconhecido.com",
+
+    };
+
+    return setUser(filteredUser)
+
   };
 
   const handleLogout = () => {
+    localStorage.clear()
     setUser(null);
   };
 

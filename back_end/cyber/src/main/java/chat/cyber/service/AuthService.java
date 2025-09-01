@@ -72,7 +72,7 @@ public class AuthService {
         if (!passwordIsEqual){
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErroResponse("Senhas diferentes", 401));
+                    .body(new ErroResponse("Senha está incorreta", 401));
 
         }
 

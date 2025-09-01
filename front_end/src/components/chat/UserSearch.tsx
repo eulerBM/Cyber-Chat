@@ -22,7 +22,6 @@ function createChat(user: User) {
   // Pega o usuário logado do localStorage (ajuste conforme sua implementação)
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const searchUser = localStorage.getItem("searchUser") || "{}";
-  const [error, setError] = useState<string | null>(null);
 
   // Monta o DTO que o backend espera
   const data = {

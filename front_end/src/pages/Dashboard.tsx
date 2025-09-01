@@ -17,9 +17,14 @@ interface DashboardProps {
   
 }
 
-
 export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  function onBackChat(){
+
+    localStorage.removeItem("chatIdPublic")
+    setSelectedUser(null)
+  }
 
   return (
     <div className="min-h-screen p-6 relative">
@@ -70,7 +75,7 @@ export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
             <div className="fade-in-up">
               <ChatInterface
                 selectedUser={selectedUser}
-                onBack={() => setSelectedUser(null)}
+                onBack={() => onBackChat()}
               />
             </div>
           ) : (

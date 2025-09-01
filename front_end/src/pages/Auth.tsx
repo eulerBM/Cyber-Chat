@@ -11,14 +11,10 @@ export default function Auth({ onAuthenticated }: AuthProps) {
   const [isLogin, setIsLogin] = useState(true);
 
   const handleLogin = (email: string, password: string) => {
-    // Mock authentication - replace with real auth
-    console.log("Login:", { email, password });
     onAuthenticated({ name: "Usuário", email });
   };
 
   const handleRegister = (name: string, email: string, password: string) => {
-    // Mock registration - replace with real auth
-    console.log("Register:", { name, email, password });
     onAuthenticated({ name, email });
   };
 
