@@ -18,10 +18,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class Security {
 
     private final JwtFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
 
-    public Security(JwtFilter jwtFilter) {
+    public Security(JwtFilter jwtFilter, RateLimitFilter rateLimitFilter) {
         this.jwtFilter = jwtFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
+
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,7 +36,7 @@ public class Security {
                         .anyRequest().permitAll() // outras precisam de login
                 )
 
-
+                .addFilterBefore(rateLimitFilter, JwtFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
