@@ -36,7 +36,7 @@ public class Security {
                         .anyRequest().permitAll() // outras precisam de login
                 )
 
-                .addFilterBefore(rateLimitFilter, JwtFilter.class)
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
