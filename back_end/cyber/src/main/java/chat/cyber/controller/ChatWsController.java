@@ -17,7 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 public class ChatWsController {
 
-    public ChatWsController(ChatService chatService, SimpMessagingTemplate messagingTemplate, ChatRepository chatRepository, UserRepository userRepository, MessageRepository messageRepository) {
+    public ChatWsController(ChatService chatService, SimpMessagingTemplate messagingTemplate,
+                            ChatRepository chatRepository, UserRepository userRepository,
+                            MessageRepository messageRepository) {
         this.messagingTemplate = messagingTemplate;
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
@@ -48,8 +50,6 @@ public class ChatWsController {
         messageRepository.save(messageEntity);
 
         messagingTemplate.convertAndSend("/queue/" + message.getChatIdPublic(), message);
-
-        System.out.println("to enviando kkkk "+ message.getDate());
 
         return message;
 

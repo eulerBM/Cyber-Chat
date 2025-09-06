@@ -26,6 +26,9 @@ public class User {
     @Column(length = 100, nullable = false)
     private String password;
 
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean online;
+
     @ManyToMany(mappedBy = "users",
             cascade = CascadeType.MERGE,
             fetch = FetchType.LAZY,
@@ -45,6 +48,14 @@ public class User {
         if (idPublic == null){
             idPublic = UUID.randomUUID();
         }
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 
     public User() {}

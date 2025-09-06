@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { UserSearch } from "@/components/chat/UserSearch";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { LogOut, MessageSquare, Bell } from "lucide-react";
+import { Client } from "@stomp/stompjs";
 
 interface User {
   id: string;
@@ -26,6 +27,8 @@ interface OfflineNotification {
 
 export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const stompClientRef = useRef<Client | null>(null);
+  const user = JSON.parse(localStorage.getItem("user"))
 
   // --- Notificações offline (sininho) ---
   const [offlineNotifications, setOfflineNotifications] = useState<
@@ -67,6 +70,55 @@ export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
       });
     }
   }, [bellOpen]);
+
+
+
+  // Ver se usuario logado esta online
+  useEffect(() => {
+  const stompClient = new Client({
+    brokerURL: "ws://localhost:8080/ws-chat",
+    reconnectDelay: 5000,
+    debug: (str) => console.log(str),
+  });
+
+  stompClient.onConnect = () => {
+    console.log("✅ Conectado ao WebSocket!");
+
+    stompClient.subscribe("/queue/online/" + user.idPublic, (msg) => {
+      const message = JSON.parse(msg.body);
+      console.log("📩 Recebida:", message);
+    });
+
+    // 🔄 Enviar status online a cada 5 segundos
+    const interval = setInterval(() => {
+      const idPublicUserOnline = {
+        uuidUser: user.idPublic,
+      };
+
+      if (stompClient.connected) {
+        stompClient.publish({
+          destination: "/app/user/online",
+          body: JSON.stringify(idPublicUserOnline),
+        });
+        console.log("📤 Enviado:", idPublicUserOnline);
+      }
+    }, 5000);
+
+    // Cleanup do intervalo
+    stompClient.onDisconnect = () => {
+      clearInterval(interval);
+    };
+  };
+
+  stompClient.activate();
+  stompClientRef.current = stompClient;
+
+  return () => {
+    if (stompClientRef.current) {
+      stompClientRef.current.deactivate();
+    }
+  };
+}, [user.idPublic]);
 
   // --- fim sininho ---
 
