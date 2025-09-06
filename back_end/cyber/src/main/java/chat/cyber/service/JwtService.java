@@ -23,7 +23,7 @@ public class JwtService {
     @Value("${jwt.refresh.token.expiration}")
     private long refreshTokenExpiration;
 
-    @Value("${JWT_SECRET}")
+    @Value("${jwt.secret}")
     private String tokenSecret;
 
     public SecretKey getSignInKey(){

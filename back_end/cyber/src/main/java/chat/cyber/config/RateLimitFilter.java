@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,10 +38,25 @@ public class RateLimitFilter extends OncePerRequestFilter {
         Bucket bucket = resolveBucket(ip);
 
         if (bucket.tryConsume(1)) {
+
             filterChain.doFilter(request, response);
+
         } else {
-            response.setStatus(429); // Too Many Requests
-            response.getWriter().write("Rate limit exceeded");
+
+            response.setHeader("Retry-After", "60");
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            String json = """
+                {
+                    "status": 429,
+                    "error": "Too Many Requests",
+                    "message": "Você excedeu o limite de requisições. Tente novamente em 1 minuto."
+                }
+                """;
+
+            response.getWriter().write(json);
         }
     }
 }
