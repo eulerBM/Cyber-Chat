@@ -31,6 +31,11 @@ function createChat(user: User) {
    
   };
 
+  localStorage.setItem("userSelect", searchUser)
+
+  console.log("Usuario logado", loggedUser)
+  console.log("Usuario selecionado", searchUser)
+
   fetch("http://localhost:8080/chat/create", {
     method: "POST",
     headers: {
@@ -67,9 +72,6 @@ function createChat(user: User) {
         localStorage.setItem("chatIdPublic", data.idPublicChat)
 
       }
-
-      console.log(data)
-
     
       })
       .then((chatId) => {

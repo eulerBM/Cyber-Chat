@@ -3,8 +3,9 @@ import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { UserSearch } from "@/components/chat/UserSearch";
 import { ChatInterface } from "@/components/chat/ChatInterface";
-import { LogOut, MessageSquare, Bell } from "lucide-react";
+import { LogOut, MessageSquare, Bell, Cookie } from "lucide-react";
 import { Client } from "@stomp/stompjs";
+import Cookies from "js-cookie";
 
 interface User {
   id: string;
@@ -27,8 +28,10 @@ interface OfflineNotification {
 
 export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isStatus, setIsStatus] = useState(null);
   const stompClientRef = useRef<Client | null>(null);
   const user = JSON.parse(localStorage.getItem("user"))
+  const token = Cookies.get("tokenAccess");
 
   // --- Notificações offline (sininho) ---
   const [offlineNotifications, setOfflineNotifications] = useState<
@@ -75,8 +78,18 @@ export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
 
   // Ver se usuario logado esta online
   useEffect(() => {
+     console.log("token em baixo: ");
+
+    console.log(token);
+
   const stompClient = new Client({
+
     brokerURL: "ws://localhost:8080/ws-chat",
+
+    connectHeaders: {
+      Authorization: `Bearer ${token}`,
+    },
+
     reconnectDelay: 5000,
     debug: (str) => console.log(str),
   });
@@ -87,6 +100,7 @@ export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
     stompClient.subscribe("/queue/online/" + user.idPublic, (msg) => {
       const message = JSON.parse(msg.body);
       console.log("📩 Recebida:", message);
+      setIsStatus(message);
     });
 
     // 🔄 Enviar status online a cada 5 segundos
@@ -164,7 +178,7 @@ export default function Dashboard({ currentUser, onLogout }: DashboardProps) {
                 </p>
                 <div className="flex items-center space-x-2 mt-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full pulse-glow" />
-                  <span className="text-sm text-muted-foreground">Online</span>
+                  <span className="text-sm text-muted-foreground">Online {isStatus}</span>
                 </div>
               </div>
             </div>

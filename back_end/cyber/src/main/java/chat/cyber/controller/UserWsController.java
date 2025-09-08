@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class UserWsController {
@@ -24,6 +26,25 @@ public class UserWsController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @MessageMapping("/this/online")
+    public void thisUserOnine(userOnlineDTO data){
+        Map<String, Object> payload = new HashMap<>();
+
+        User getUser = userRepository.findByIdPublic(data.getUuidUser())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User não encontrado"));
+
+        if (getUser.isOnline()){
+            payload.put("status", true);
+
+            messagingTemplate.convertAndSend("/queue/online/this/" + data.getUuidUser(), payload);
+
+        } else {
+            payload.put("status", false);
+
+            messagingTemplate.convertAndSend("/queue/online/this/" + data.getUuidUser(), payload);
+        }
+    }
+
     @MessageMapping("/user/online")
     public boolean userOnine(userOnlineDTO data){
 
@@ -33,18 +54,14 @@ public class UserWsController {
         if (getUser.isOnline()){
 
             messagingTemplate.convertAndSend("/queue/online/" + data.getUuidUser(), true);
-            System.out.println("USUARIO ja esta logado :D");
             return true;
 
         }
-
-
         getUser.setOnline(true);
 
         userRepository.save(getUser);
 
         messagingTemplate.convertAndSend("/queue/online/" + data.getUuidUser(), true);
-        System.out.println("To enviando :D");
 
         return true;
 
@@ -53,8 +70,6 @@ public class UserWsController {
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event){
         Principal p = event.getUser();
-
-        System.out.println(p);
 
         if (p != null){
             String userEmail = p.getName();

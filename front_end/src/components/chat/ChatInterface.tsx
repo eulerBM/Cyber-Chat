@@ -33,10 +33,62 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
 
   const currentUserId = JSON.parse(localStorage.getItem("user")).idPublic; // 👉 depois substitui pelo ID real do usuário logado
   const getIdPublicChat = localStorage.getItem("chatIdPublic");
+  const userSelect = localStorage.getItem("userSelect");
+  const [getStatusUser, setStatusUser] = useState(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+       
+    const stompClient = new Client({
+  
+      brokerURL: "ws://localhost:8080/ws-chat",
+      reconnectDelay: 5000,
+      debug: (str) => console.log(str),
+    });
+  
+    stompClient.onConnect = () => {
+      console.log("✅ Conectado ao WebSocket!");
+  
+      stompClient.subscribe("/queue/online/this/" + userSelect, (msg) => {
+        const data = JSON.parse(msg.body);
+        console.log("📩 Recebida se o user esta online:", data.status);
+        setStatusUser(data.status === true);
+      });
+  
+      // 🔄 Enviar status online a cada 5 segundos
+      const interval = setInterval(() => {
+        
+        const idPublicUserOnline = {
+          uuidUser: userSelect,
+        };
+  
+        if (stompClient.connected) {
+          stompClient.publish({
+            destination: "/app/this/online",
+            body: JSON.stringify(idPublicUserOnline),
+          });
+          console.log("📤 Enviado:", idPublicUserOnline);
+        }
+      }, 5000);
+  
+      // Cleanup do intervalo
+      stompClient.onDisconnect = () => {
+        clearInterval(interval);
+      };
+    };
+  
+    stompClient.activate();
+    stompClientRef.current = stompClient;
+  
+    return () => {
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+      }
+    };
+  }, [getStatusUser]);
 
   useEffect(() => {
     scrollToBottom();
@@ -203,7 +255,11 @@ useEffect(() => {
               </p>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full pulse-glow" />
-                <p className="text-sm text-muted-foreground">Online agora</p>
+                <p className="text-sm text-muted-foreground">
+
+                {getStatusUser ? "🟢 Online agora" : "🔴 Offline"}
+
+                </p>
               </div>
             </div>
           </div>
