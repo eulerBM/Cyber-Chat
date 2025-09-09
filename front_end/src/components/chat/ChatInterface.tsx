@@ -54,7 +54,6 @@ export function ChatInterface({ selectedUser, onBack }: ChatInterfaceProps) {
   
       stompClient.subscribe("/queue/online/this/" + userSelect, (msg) => {
         const data = JSON.parse(msg.body);
-        console.log("📩 Recebida se o user esta online:", data.status);
         setStatusUser(data.status === true);
       });
   
@@ -111,7 +110,6 @@ useEffect(() => {
           throw new Error("Chat já existe");
         }
 
-        console.log(response.json);
         throw new Error("Erro ao criar chat");
       }
 
@@ -134,9 +132,6 @@ useEffect(() => {
               
             },
           ]);
-
-          
-          console.log("msg pegas: ", msg.content);
         });
       }
     })
@@ -159,8 +154,7 @@ useEffect(() => {
       });
 
       stompClient.onConnect = () => {
-        console.log("✅ Conectado ao WebSocket!");
-
+      
         // 🔔 Receber mensagens privadas
         stompClient.subscribe("/queue/" + getIdPublicChat, (msg) => {
           const message = JSON.parse(msg.body);
