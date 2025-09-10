@@ -33,6 +33,8 @@ public class AuthServiceTest {
 
     }
 
+    /// CreateUser Service
+
     @Test
     @DisplayName("Testa se as senhas não são iguais")
     void shouldReturnErrorIfPasswordsAreDifferent(){
@@ -71,6 +73,10 @@ public class AuthServiceTest {
 
         assertEquals(200, response.getStatusCode().value());
     }
+
+    /// LoginService
+
+
 
 
 }
