@@ -33,6 +33,9 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
+    //db h2 testes
+    runtimeOnly 'com.h2database:h2'
+
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

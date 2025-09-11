@@ -2,35 +2,36 @@ package chat.cyber.serviceTest;
 
 
 import chat.cyber.controller.dtos.CreateUserDTO;
-import chat.cyber.entity.User;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.AuthService;
 import chat.cyber.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Optional;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@org.junit.jupiter.api.extension.ExtendWith(MockitoExtension.class)
+@DataJpaTest
+@ActiveProfiles("test")
 public class AuthServiceTest {
 
-    private AuthService authService;
+    @Autowired
     private UserRepository userRepository;
+
+    private AuthService authService;
+
     private JwtService jwtService;
+
 
     @BeforeEach
     void setup() {
-        userRepository = mock(UserRepository.class);
         jwtService = mock(JwtService.class);
         authService = new AuthService(userRepository, jwtService);
-
     }
 
     /// CreateUser Service
@@ -50,16 +51,16 @@ public class AuthServiceTest {
     @Test
     @DisplayName("Testa se tem dois e-mails iguais salvos")
     void shouldReturnAnErrorIfTwoEmailsAreTheSameInTheDatabase(){
-
         CreateUserDTO dto = new CreateUserDTO("testName",
                 "test@gmail.com", "123456789", "123456789");
 
-        when(userRepository.findByEmail("test@gmail.com"))
-                .thenReturn(Optional.of(new User())); // simula e-mail já existente
+        // Primeiro cadastro
+        ResponseEntity<?> responseFirst = authService.createUser(dto);
+        assertEquals(200, responseFirst.getStatusCode().value());
 
-        ResponseEntity<?> response = authService.createUser(dto);
-
-        assertEquals(409, response.getStatusCode().value());
+        // Segundo cadastro → deve dar erro de duplicado
+        ResponseEntity<?> responseEqual = authService.createUser(dto);
+        assertEquals(409, responseEqual.getStatusCode().value());
     }
 
     @Test
