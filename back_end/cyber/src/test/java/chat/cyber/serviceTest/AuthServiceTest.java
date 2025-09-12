@@ -2,6 +2,7 @@ package chat.cyber.serviceTest;
 
 
 import chat.cyber.controller.dtos.CreateUserDTO;
+import chat.cyber.controller.dtos.LoginUserDTO;
 import chat.cyber.repository.UserRepository;
 import chat.cyber.service.AuthService;
 import chat.cyber.service.JwtService;
@@ -39,13 +40,10 @@ public class AuthServiceTest {
     @Test
     @DisplayName("Testa se as senhas não são iguais")
     void shouldReturnErrorIfPasswordsAreDifferent(){
-
         ResponseEntity<?> response = authService.createUser(new CreateUserDTO("testName",
                 "test@gmail.com", "123456789", "12345"));
 
         assertEquals(400, response.getStatusCode().value());
-
-
     }
 
     @Test
@@ -71,11 +69,72 @@ public class AuthServiceTest {
                 "test@gmail.com", "123456789", "123456789");
 
         ResponseEntity<?> response = authService.createUser(dto);
-
         assertEquals(200, response.getStatusCode().value());
     }
 
     /// LoginService
+
+    @Test
+    @DisplayName("Deve retonar ok ao fazer login")
+    void shuldReturnOkMakeLogin(){
+
+        String email = "test@gmail.com";
+        String password = "123456789";
+
+        CreateUserDTO dto = new CreateUserDTO("testName",
+                email, password, password);
+
+        LoginUserDTO loginUserDTO = new LoginUserDTO(email, password);
+
+        //Cria usuario -> Deve retornar OK 200
+        ResponseEntity<?> response = authService.createUser(dto);
+        assertEquals(200, response.getStatusCode().value());
+
+        //Login usuario -> deve retornar OK 200
+        ResponseEntity<?> responseLogin = authService.loginUser(loginUserDTO);
+        assertEquals(200, responseLogin.getStatusCode().value());
+
+    }
+
+    @Test
+    @DisplayName("Deve retonar erro not found")
+    void shuldReturnErroNotFoundEmail(){
+
+        String email = "test@gmail.com";
+        String password = "123456789";
+
+        LoginUserDTO loginUserDTO = new LoginUserDTO(email, password);
+
+        //Login usuario -> deve retornar ERRO 404
+        ResponseEntity<?> responseLogin = authService.loginUser(loginUserDTO);
+        assertEquals(404, responseLogin.getStatusCode().value());
+
+    }
+
+    @Test
+    @DisplayName("Deve retonar erro ao fazer login com senha diferente")
+    void shuldReturnErroWhenDoingLogin(){
+
+        String email = "test@gmail.com";
+        String password = "123456789";
+        String passwordErro = "12345678";
+
+        CreateUserDTO dto = new CreateUserDTO("testName",
+                email, password, password);
+
+        LoginUserDTO loginUserDTO = new LoginUserDTO(email, passwordErro);
+
+        //Cria usuario -> Deve retornar OK 200
+        ResponseEntity<?> response = authService.createUser(dto);
+        assertEquals(200, response.getStatusCode().value());
+
+        //Login usuario -> deve retornar ERRO 401
+        ResponseEntity<?> responseLogin = authService.loginUser(loginUserDTO);
+        assertEquals(401, responseLogin.getStatusCode().value());
+
+    }
+
+
 
 
 
