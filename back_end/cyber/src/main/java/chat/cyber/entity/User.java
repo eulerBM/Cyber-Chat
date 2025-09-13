@@ -91,4 +91,8 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public void setIdPublic(UUID idPublic) {
+        this.idPublic = idPublic;
+    }
 }

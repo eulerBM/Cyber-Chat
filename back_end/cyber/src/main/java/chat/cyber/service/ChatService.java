@@ -35,7 +35,6 @@ public class ChatService {
         Optional<User> userSendByIdpublic = userRepository.findByIdPublic(data.idPublicUserSend());
         Optional<User> userReceivedByIdpublic = userRepository.findByIdPublic(data.idPublicUserReceived());
 
-
         if (userSendByIdpublic.isEmpty() || userReceivedByIdpublic.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuarios não encontrados");
         }
@@ -51,8 +50,6 @@ public class ChatService {
         Optional<Chat> chatGetUsers = chatRepository.findByUsers(userSendByIdpublic.get().getId(), userReceivedByIdpublic.get().getId());
 
         if (chatGetUsers.isPresent()){
-
-            System.out.println("Esse chat ta presente!");
 
             Chat chatGet = chatGetUsers.get();
 
